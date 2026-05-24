@@ -25,6 +25,7 @@
 ## CLI Agent Helpers
 
 - 🔥 [sandboxed-agents](https://github.com/kailiu42/sandboxed-agents) -- Unified bwrap sandbox wrapper for multiple coding agents — oh-my-pi, Claude Code, Codex — with per-agent profiles and layered config
+- 👀 [forkd](https://github.com/deeplethe/forkd) -- MicroVM sandbox runtime for AI agent fan-out — fork 100 microVMs in ~100ms, BRANCH a live VM in ~150ms, KVM-isolated snapshot CoW
 
 ## Token Savers
 
