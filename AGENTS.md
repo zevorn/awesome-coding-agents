@@ -2,55 +2,63 @@
 
 ## Project Overview
 
-A personally curated, opinionated list of AI coding agents and developer tools. The repository is a single markdown page (`README.md`) that tracks tools across categories (CLI agents, subscription management) with status ratings and brief descriptions.
+A personally curated, opinionated list of AI coding agents and developer tools. The repository maintains tool data in `list.md` and generates a minimal GitHub Pages static site from that Markdown source.
 
 ## Architecture & Data Flow
 
-The project is a flat, single-document list. There is no code, no build pipeline, no data flow. The only content file is `README.md` at the repository root. Changes are made by editing the markdown table cells.
+`list.md` is the single human-edited catalog source. The Node build pipeline parses it, validates its fixed categories and fields, fetches GitHub metrics at build time, ranks tools inside each category, and writes `dist/index.html`.
 
-## Key Directories
+GitHub metrics are deployment-time data only. Never write stars, open issues, or open pull request counts back into Markdown.
 
-There are no subdirectories. The repository root contains:
+## Key Paths
 
 | Path | Purpose |
-|------|---------|
-| `README.md` | The entire content: curated list with status legend, category tables, and notes |
-| `AGENTS.md` | This file — AI assistant guidelines |
+|---|---|
+| `list.md` | Catalog source of truth |
+| `scripts/catalog.mjs` | Parser, validation, GitHub metric fetch, ranking, HTML renderer |
+| `scripts/build.mjs` | CLI entry for validation/build |
+| `test/catalog.test.mjs` | Focused parser/ranking/render tests |
+| `.github/workflows/pages.yml` | Scheduled/push/manual GitHub Pages deployment |
+| `.agents/skills/add-tool/SKILL.md` | Source add-tool skill |
+| `.claude/skills/add-tool` | Symlink to the add-tool skill |
 
 ## Development Commands
 
-No build, test, lint, or run commands exist. There is no `package.json`, `Makefile`, or any task runner. The project is purely content.
+```sh
+make build
+make run
+make deploy
+```
 
-## Code Conventions & Common Patterns
+- `make build` fetches GitHub metrics and writes `dist/index.html`.
+- `make run` builds and serves `dist/` locally on port `8080`; override with `make run PORT=3000`.
+- `make deploy` runs list validation, tests, and build for GitHub Pages artifact creation in CI.
+- `npm run validate:list` validates `list.md` categories, table format, required fields, tags, statuses, and GitHub repo URLs without fetching GitHub metrics.
 
-- **Markdown tables** — All tools are listed in GitHub-flavored markdown tables with three columns: Tool (linked), Status (emoji), Description.
-- **Status emojis** — Three tiers: 🔥 (long-term daily driver), 🧪 (actively trying), 👀 (recently discovered).
-- **Section headers** — `##` for top-level categories, `---` horizontal rule as a visual separator between sections.
-- **Linked entries** — Tool names are hyperlinked to their GitHub repos or official docs.
-- **Table alignment** — Left-aligned (default). No alignment directives.
+## Catalog Conventions
 
-## How to add an entry
+- Fixed categories: `Agent TUI`, `Agent Harness`, `Agent Tool`.
+- Markdown tables use exactly five columns: Status, Tool, Repo, Tags, Description.
+- Status emojis: 🔥, 🧭, 👀.
+- Repo must be a GitHub repository URL.
+- Tags are comma-separated short lowercase labels.
+- Description should use GitHub repo About text when available.
 
-When adding an entry, below rules must be followed.
+## Visual Conventions
 
-- **Tool name**: must use it's official name.
-- **Tool URL**: must point to it's official page. Prefer github repos over web sites.
-- **Tool Description**: use the "About" information from github repo. If not present, use the HTML `description` meta header from website.
+The generated HTML uses the Swiss Style / International Klein Blue theme:
 
-## Important Files
-
-| File | Role |
-|------|------|
-| `README.md` | Single source of truth — all curated content lives here |
-
-## Runtime/Tooling Preferences
-
-- No runtime required. The project is static Markdown.
-- No package manager.
-- No CI/CD configuration present.
+- background `#fafaf8`;
+- text `#0a0a0a`;
+- accent `#002FA7` only;
+- sans-serif typography;
+- grid alignment, sharp corners, hairline borders;
+- no gradients, shadows, rounded cards, or extra accent colors.
 
 ## Testing & QA
 
-- No test framework exists.
-- No test runner configured.
-- Quality is maintained through manual curation: status emojis are adjusted as experience with each tool evolves, noted in the "Notes" section footer.
+Before yielding changes that affect the catalog, build, rendering, ranking, or workflow, run the focused commands that cover the change. For most implementation work, run:
+
+```sh
+make deploy
+```

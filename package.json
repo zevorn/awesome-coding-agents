@@ -1,0 +1,14 @@
+{
+  "name": "awesome-coding-agents",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "npm run validate:list",
+    "validate:list": "node scripts/validate-list.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

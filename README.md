@@ -2,35 +2,47 @@
 
 > **This is a very opinionated list from my daily usage. I will try to keep 🔥 entries below 10 (or 20, if I can't 😉).**
 
-> See [AGENTS.md](./AGENTS.md) for contribution guidelines when adding entries.
+The catalog source lives in [`list.md`](./list.md). GitHub Pages is generated from that Markdown file plus deployment-time GitHub activity metrics.
 
+## Local commands
 
-## Legend
+```sh
+make build
+make run
+make deploy
+```
+
+- `make build` writes the static site to `dist/index.html` and fetches current GitHub stars/open issues/open PRs.
+- `make run` builds and serves `dist/` locally on port `8080`. Override with `make run PORT=3000`.
+- `make deploy` runs list validation, tests, and build; GitHub Actions uses it before uploading the Pages artifact.
+- `npm run validate:list` checks `list.md` categories, table format, statuses, required fields, tags, and GitHub repo URLs.
+
+## Catalog model
+
+The catalog has three fixed categories:
+
+- `Agent TUI`
+- `Agent Harness`
+- `Agent Tool`
+
+Status legend:
 
 | Icon | Meaning |
 |------|---------|
 | 🔥 | Long-term daily driver — proven, highly recommended |
-| 🧪 | Actively trying out, but not daily used |
+| 🧭 | Actively using — currently in rotation, not yet a daily driver |
 | 👀 | Recently discovered, looks promising, not yet tried |
 
+Each tool row in `list.md` includes status, official tool name, GitHub repo URL, tags, and description. GitHub metrics are fetched at build time and are never committed back into Markdown.
 
----
+## Adding entries
 
-## CLI Agents
+Use the add-tool skill at `.agents/skills/add-tool/SKILL.md` when working with an agent. Claude-compatible setups can use the symlink at `.claude/skills/add-tool`.
 
-- 🔥 [oh-my-pi](https://github.com/can1357/oh-my-pi) -- AI coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more
-- 🧪 [Claude Code](https://github.com/anthropics/claude-code) -- Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows — all through natural language commands
-- 🧪 [Codex CLI](https://github.com/openai/codex) -- Lightweight coding agent that runs in your terminal
+Manual additions must follow the same rules:
 
-## CLI Agent Helpers
-
-- 🔥 [sandboxed-agents](https://github.com/kailiu42/sandboxed-agents) -- Unified bwrap sandbox wrapper for multiple coding agents — oh-my-pi, Claude Code, Codex — with per-agent profiles and layered config
-- 👀 [forkd](https://github.com/deeplethe/forkd) -- MicroVM sandbox runtime for AI agent fan-out — fork 100 microVMs in ~100ms, BRANCH a live VM in ~150ms, KVM-isolated snapshot CoW
-
-## Token Savers
-
-- 🧪 [rtk](https://github.com/rtk-ai/rtk) -- CLI proxy that reduces LLM token consumption by 60-90% on common dev commands — single Rust binary, zero dependencies
-
-## Subscription Management
-
-- 🧪 [OpenUsage](https://github.com/robinebers/openusage) -- Track all your AI coding subscriptions in one place
+- Tool name uses the official name.
+- Repo points to a GitHub repository.
+- Description uses the GitHub repository About text when available.
+- Tags are short lowercase labels such as `tui`, `cli`, `gui`, `web`, `usage`, `sandbox`, `harness`, `token`.
+- GitHub stars/issues/PR counts are not written into `list.md`.
