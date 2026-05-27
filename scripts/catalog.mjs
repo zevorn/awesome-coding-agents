@@ -14,6 +14,24 @@ const STATUS_SCORE = new Map([
 
 const HEADER = ['Status', 'Tool', 'Repo', 'Tags', 'Description'];
 
+const STATUS_LABELS = new Map([
+  ['🔥', 'Daily driver'],
+  ['🧭', 'Actively using'],
+  ['👀', 'Recently discovered'],
+]);
+
+const STATUS_SVGS = {
+  '🔥': '<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M27 58C16 55 10 46 10 35c0-9 4-18 13-27-1 9 2 16 8 21 8-8 11-17 8-27 13 7 21 19 21 33 0 12-7 21-19 23" stroke="var(--status-hot)" stroke-width="4.5"/><path d="M32 58c-7-3-10-8-10-15 0-8 4-14 12-21-1 8 2 12 8 17 4 4 6 8 6 13 0 3-1 5-3 6" stroke="var(--status-warm)" stroke-width="4.5"/></g></svg>',
+  '🧭': '<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M25 7h14M32 7v7M47 15l6 6M18 17a25 25 0 1 0 28 0" stroke="var(--ink)" stroke-width="4.5"/><path d="M18 32a14 14 0 0 1 14-14M46 32a14 14 0 0 1-28 0M32 32l12-12" stroke="var(--accent)" stroke-width="4.5"/><path d="M32 25v-3M22 32h-3M32 45v-3M45 32h-3M25 25l-2-2" stroke="var(--ink)" stroke-width="4"/><circle cx="32" cy="32" r="3.5" stroke="var(--accent)" stroke-width="4"/></g></svg>',
+  '👀': '<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 32c8-12 17-18 27-18s19 6 27 18c-8 12-17 18-27 18S13 44 5 32Z" stroke="var(--grey-3)" stroke-width="4.5"/><circle cx="32" cy="32" r="12" stroke="var(--status-discovered)" stroke-width="4.5"/><circle cx="32" cy="32" r="5" stroke="var(--ink)" stroke-width="4.5"/><path d="M25 26c1-3 3-5 6-6" stroke="var(--grey-3)" stroke-width="4"/></g></svg>',
+};
+
+const STATUS_ACCENTS = {
+  '🔥': 'var(--status-hot)',
+  '🧭': 'var(--accent)',
+  '👀': 'var(--status-discovered)',
+};
+
 export function parseCatalog(markdown) {
   const lines = markdown.split(/\r?\n/);
   const tools = [];
@@ -318,7 +336,8 @@ export function renderHtml(groupedTools, generatedAt = new Date(), options = {})
   const siteMetrics = options.siteMetrics ?? { stars: 0, issues: 0, prs: 0 };
   const siteStars = options.siteMetricsAvailable === false ? 'N/A' : formatMetricDisplay(siteMetrics.stars);
   const siteRepoUrl = `https://github.com/${siteRepo}`;
-  const payload = JSON.stringify({ categories: CATEGORIES, tools: groupedTools })
+  const statusLabels = Object.fromEntries(STATUS_LABELS);
+  const payload = JSON.stringify({ categories: CATEGORIES, tools: groupedTools, statusSvgs: STATUS_SVGS, statusLabels, statusAccents: STATUS_ACCENTS })
     .replace(/</g, '\\u003c');
 
   return `<!doctype html>
@@ -337,6 +356,9 @@ export function renderHtml(groupedTools, generatedAt = new Date(), options = {})
       --grey-3: #737373;
       --accent: #002FA7;
       --accent-on: #ffffff;
+      --status-hot: #FF6B35;
+      --status-warm: #FFD500;
+      --status-discovered: #0F7A3A;
     }
     * { box-sizing: border-box; }
     body {
@@ -367,14 +389,15 @@ export function renderHtml(groupedTools, generatedAt = new Date(), options = {})
     button:hover, button[aria-selected="true"], button.active { background: var(--accent); border-color: var(--accent); color: var(--accent-on); }
     .tools { display: grid; gap: 1px; background: var(--ink); border: 1px solid var(--ink); }
     .tool { display: grid; grid-template-columns: 56px minmax(0, 1fr) max-content; gap: 20px; background: var(--paper); padding: 22px; }
-    .status { font-size: 26px; }
-    .tool h2 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 56px); line-height: .92; font-weight: 300; letter-spacing: -.04em; }
+    .status { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; }
+    .status svg { width: 34px; height: 34px; display: block; overflow: visible; }
+    .tool h2 { margin: 0 0 8px; color: var(--tool-accent, var(--accent)); font-size: clamp(28px, 4vw, 56px); line-height: .92; font-weight: 300; letter-spacing: -.04em; }
     .description { margin: 0; color: var(--grey-3); max-width: 680px; }
     .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
     .tag { border: 1px solid var(--grey-2); color: var(--grey-3); padding: 4px 7px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; }
     .metrics { display: grid; grid-template-columns: repeat(3, 7.875rem); gap: 10px; align-self: start; justify-content: end; }
-    .metric { display: flex; flex-direction: column; align-items: flex-end; border-top: 6px solid var(--accent); background: var(--grey-1); padding: 12px; min-height: 82px; text-align: right; }
-    .metric strong { display: block; width: 100%; font-size: clamp(22px, 2.1vw, 30px); line-height: 1; font-weight: 250; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -.04em; white-space: nowrap; }
+    .metric { display: flex; flex-direction: column; align-items: flex-end; border-top: 6px solid var(--tool-accent, var(--accent)); background: var(--grey-1); padding: 12px; min-height: 82px; text-align: right; }
+    .metric strong { display: block; width: 100%; font-size: clamp(22px, 2.1vw, 30px); line-height: 1; font-weight: 250; color: var(--tool-accent, var(--accent)); font-variant-numeric: tabular-nums; letter-spacing: -.04em; white-space: nowrap; }
     .metric span { display: block; color: var(--grey-3); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; letter-spacing: .08em; margin-top: 8px; text-transform: uppercase; }
     .empty { border: 1px solid var(--ink); padding: 34px; color: var(--grey-3); }
 
@@ -438,6 +461,16 @@ export function renderHtml(groupedTools, generatedAt = new Date(), options = {})
       return '<div class="metric"><strong>' + html(value) + '</strong><span>' + label + '</span></div>';
     }
 
+    function statusIcon(tool) {
+      const label = catalog.statusLabels[tool.status] || 'Status';
+      const svg = catalog.statusSvgs[tool.status] || html(tool.status);
+      return '<div class="status" role="img" aria-label="' + html(label) + '" title="' + html(label) + '">' + svg + '</div>';
+    }
+
+    function statusAccent(tool) {
+      return catalog.statusAccents[tool.status] || 'var(--accent)';
+    }
+
     function renderTabs() {
       tabs.innerHTML = catalog.categories.map(category =>
         '<button type="button" aria-selected="' + (category === activeCategory) + '" data-category="' + html(category) + '">' + html(category) + '</button>'
@@ -457,8 +490,8 @@ export function renderHtml(groupedTools, generatedAt = new Date(), options = {})
 
       results.className = filtered.length ? 'tools' : 'empty';
       results.innerHTML = filtered.length ? filtered.map(tool =>
-        '<article class="tool">' +
-          '<div class="status" aria-label="status">' + html(tool.status) + '</div>' +
+        '<article class="tool" style="--tool-accent: ' + html(statusAccent(tool)) + '">' +
+          statusIcon(tool) +
           '<div>' +
             '<h2><a href="' + html(tool.repo) + '">' + html(tool.tool) + '</a></h2>' +
             '<p class="description">' + html(tool.description) + '</p>' +

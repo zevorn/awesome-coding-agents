@@ -29,9 +29,9 @@ Status legend:
 
 | Icon | Meaning |
 |------|---------|
-| 🔥 | Long-term daily driver — proven, highly recommended |
-| 🧭 | Actively using — currently in rotation, not yet a daily driver |
-| 👀 | Recently discovered, looks promising, not yet tried |
+| <img src="assets/status-daily-driver.svg" width="22" alt="Daily driver"> | Long-term daily driver — proven, highly recommended |
+| <img src="assets/status-active-using.svg" width="22" alt="Actively using"> | Actively using — currently in rotation, not yet a daily driver |
+| <img src="assets/status-discovered.svg" width="22" alt="Recently discovered"> | Recently discovered, looks promising, not yet tried |
 
 Each tool row in `list.md` includes status, official tool name, GitHub repo URL, tags, and description. GitHub metrics are fetched at build time and are never committed back into Markdown.
 

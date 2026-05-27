@@ -39,7 +39,7 @@ make deploy
 
 - Fixed categories: `Agent TUI`, `Agent Harness`, `Agent Tool`.
 - Markdown tables use exactly five columns: Status, Tool, Repo, Tags, Description.
-- Status emojis: 🔥, 🧭, 👀.
+- Status values in `list.md`: 🔥, 🧭, 👀. The generated page renders them with SVG icons from `assets/status-*.svg`.
 - Repo must be a GitHub repository URL.
 - Tags are comma-separated short lowercase labels.
 - Description should use GitHub repo About text when available.

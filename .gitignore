@@ -1,3 +1,5 @@
 .plans
 .superpowers
 dist
+.DS_Store
+image/
